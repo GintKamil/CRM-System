@@ -1,0 +1,385 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Подтверждение кода</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .verification-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .verification-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .verification-header h2 {
+                color: #333;
+                font-size: 28px;
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+
+            .verification-header p {
+                color: #666;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+        .email-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+            .email-info strong {
+                color: #333;
+                font-weight: 600;
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .email-info span {
+                color: #764ba2;
+                font-weight: 500;
+                word-break: break-all;
+            }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 500;
+                font-size: 14px;
+            }
+
+        .code-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+            .code-input:focus {
+                outline: none;
+                border-color: #667eea;
+                background-color: white;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+
+            .btn-secondary:hover {
+                background: #e9ecef;
+                border-color: #667eea;
+            }
+
+        .timer {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 13px;
+        }
+
+            .timer span {
+                color: #dc3545;
+                font-weight: 600;
+            }
+
+        .resend-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .resend-link a {
+                color: #667eea;
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+                .resend-link a:hover {
+                    text-decoration: underline;
+                }
+
+        .alert-error {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2b8a3e;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .verification-container {
+                padding: 30px 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .code-input {
+                font-size: 16px;
+                letter-spacing: 6px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="verification-header">
+            <h2>Подтверждение</h2>
+            <p>Введите код подтверждения, отправленный на вашу электронную почту</p>
+        </div>
+
+        <!-- Отображение сообщений об ошибках/успехе -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-error">
+                <strong>Ошибка!</strong> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Блок с информацией о почте -->
+        <div class="email-info">
+            <strong>Код отправлен на почту:</strong>
+            <span>@ViewBag.Email</span>
+        </div>
+
+        <!-- Форма для ввода кода -->
+        <form method="post">
+            <div class="form-group">
+                <label for="VerificationCode">Код подтверждения</label>
+                <input type="text" id="VerificationCode" name="VerificationCode"
+                       class="code-input"
+                       maxlength="6"
+                       pattern="[0-9]*"
+                       inputmode="numeric"
+                       placeholder="000000"
+                       required />
+            </div>
+
+            <!-- Таймер для повторной отправки -->
+            <div class="timer" id="timer">
+                Отправить код повторно можно через <span id="countdown">60</span> секунд
+            </div>
+
+            <!-- Ссылка для повторной отправки (изначально скрыта) -->
+            <div class="resend-link" id="resendLink" style="display: none;">
+                <a href="#" id="resendBtn">Отправить код повторно</a>
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="btn-group">
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    Назад
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    Подтвердить
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Автоматический фокус на поле ввода кода
+            const codeInput = document.getElementById('VerificationCode');
+            if (codeInput) {
+                codeInput.focus();
+
+                // Автоматическое добавление разделителей
+                codeInput.addEventListener('input', function(e) {
+                    let value = this.value.replace(/\D/g, '');
+                    if (value.length > 6) value = value.substring(0, 6);
+                    this.value = value;
+                });
+            }
+
+            // Скрытие сообщений об ошибках через 5 секунд
+            const errorAlert = document.querySelector('.alert-error');
+            if (errorAlert) {
+                setTimeout(() => {
+                    errorAlert.style.opacity = '0';
+                    errorAlert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => errorAlert.remove(), 500);
+                }, 5000);
+            }
+
+            // Таймер для повторной отправки
+            const timerElement = document.getElementById('countdown');
+            const timerDiv = document.getElementById('timer');
+            const resendLink = document.getElementById('resendLink');
+            const resendBtn = document.getElementById('resendBtn');
+
+            if (timerElement) {
+                let timeLeft = 60;
+
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    timerElement.textContent = timeLeft;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        timerDiv.style.display = 'none';
+                        resendLink.style.display = 'block';
+                    }
+                }, 1000);
+
+                // Обработчик повторной отправки
+                if (resendBtn) {
+                    resendBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+
+                        // Здесь можно добавить AJAX запрос для повторной отправки кода
+                        fetch('/Account/ResendCode?email=@ViewBag.Email')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Код отправлен повторно!');
+                                    // Сброс таймера
+                                    timeLeft = 60;
+                                    timerElement.textContent = timeLeft;
+                                    timerDiv.style.display = 'block';
+                                    resendLink.style.display = 'none';
+
+                                    // Запуск таймера заново
+                                    clearInterval(countdown);
+                                    const newCountdown = setInterval(() => {
+                                        timeLeft--;
+                                        timerElement.textContent = timeLeft;
+
+                                        if (timeLeft <= 0) {
+                                            clearInterval(newCountdown);
+                                            timerDiv.style.display = 'none';
+                                            resendLink.style.display = 'block';
+                                        }
+                                    }, 1000);
+                                }
+                            });
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

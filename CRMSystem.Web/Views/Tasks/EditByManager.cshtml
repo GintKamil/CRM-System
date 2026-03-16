@@ -1,0 +1,149 @@
+﻿@using CRMSystem.Modules.Tasks.DTO
+@using CRMSystem.Shared.Entities
+@model UpdateTaskByManagerDto
+
+@{
+    ViewData["Title"] = "Редактирование задачи";
+    Layout = "_Layout";
+}
+
+<style>
+    .form-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #111827;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+    }
+
+    .btn {
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+    .validation {
+        color: #dc2626;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-header">
+        Редактирование задачи
+    </div>
+
+    <form asp-action="EditByManager" method="post">
+        <input type="hidden" asp-for="TaskId" />
+        <div class="form-group">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Priority" class="form-label"></label>
+            <select asp-for="Priority"
+                    asp-items="Html.GetEnumSelectList<TaskPriority>()"
+                    class="form-control">
+            </select>
+            <span asp-validation-for="Priority" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DueDate" class="form-label"></label>
+            <input asp-for="DueDate" type="date" class="form-control" />
+            <span asp-validation-for="DueDate" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="AssignedToId" class="form-label">Ответственный</label>
+            <select asp-for="AssignedToId"
+                    asp-items="Model.Users"
+                    class="form-control">
+            </select>
+            <span asp-validation-for="AssignedToId" class="validation"></span>
+        </div>
+
+        <div class="form-actions">
+            <a asp-action="Index" class="btn btn-secondary">
+                Назад
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Сохранить изменения
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

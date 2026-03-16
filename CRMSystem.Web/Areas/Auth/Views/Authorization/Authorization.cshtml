@@ -1,0 +1,277 @@
+﻿@using CRMSystem.Modules.Auth.Domain.Entities
+@model User
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Авторизация</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .login-header h2 {
+                color: #333;
+                font-size: 28px;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+
+            .login-header p {
+                color: #666;
+                font-size: 14px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 500;
+                font-size: 14px;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #667eea;
+                background-color: white;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+
+            .btn-secondary:hover {
+                background: #e9ecef;
+                border-color: #667eea;
+            }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+            .form-footer a {
+                color: #667eea;
+                text-decoration: none;
+                font-size: 14px;
+            }
+
+                .form-footer a:hover {
+                    text-decoration: underline;
+                }
+
+        @@media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2b8a3e;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .error-field {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Добро пожаловать</h2>
+            <p>Войдите в свой аккаунт или создайте новый</p>
+        </div>
+
+        <!-- Блок для отображения ошибок -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-error">
+                <strong>Ошибка!</strong> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form method="post">
+            <div class="form-group">
+                <label for="Email">Электронная почта</label>
+                <input type="email" id="Email" name="Email" class="form-control @(ViewData.ModelState["Email"]?.Errors?.Count > 0 ? "error-field" : "")"
+                       value="@Model?.Email" placeholder="Введите ваш email" />
+                <span class="text-danger" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="Password">Пароль</label>
+                <input type="password" id="Password" name="Password" class="form-control @(ViewData.ModelState["Password"]?.Errors?.Count > 0 ? "error-field" : "")"
+                       value="@Model?.Password" placeholder="Введите ваш пароль" />
+                <span class="text-danger" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" name="action" class="btn btn-primary" value="AutorizationButton">
+                    Вход
+                </button>
+                <button type="submit" name="action" class="btn btn-secondary" value="RegistrationButton">
+                    Регистрация
+                </button>
+            </div>
+        </form>
+
+        <div class="form-footer">
+            <a href="#">Забыли пароль?</a>
+        </div>
+    </div>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

@@ -1,0 +1,286 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 15px;
+        margin-bottom: 40px;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .hero-title {
+        font-size: 48px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        color: #666;
+        max-width: 600px;
+        margin: 0 auto 30px;
+        line-height: 1.6;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero {
+        padding: 14px 40px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-hero-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+    .btn-hero-secondary {
+        background: white;
+        color: #333;
+        border: 2px solid #e1e5e9;
+    }
+
+        .btn-hero-secondary:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    .features-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: white;
+        font-size: 32px;
+    }
+
+    .feature-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .feature-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .news-section {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .news-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e1e5e9;
+    }
+
+    .news-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .news-item {
+        display: flex;
+        gap: 20px;
+        padding: 20px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+    .news-date {
+        min-width: 80px;
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .news-content {
+        flex: 1;
+    }
+
+        .news-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .news-content p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 36px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-hero {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .news-item {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="hero-section">
+    <h1 class="hero-title">Добро пожаловать в CRM систему</h1>
+    <p class="hero-subtitle">Эффективное управление задачами, клиентами и командой. Всё в одном месте для вашего бизнеса.</p>
+    <div class="hero-buttons">
+        @if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            <a href="/Auth/Authorization/Authorization" class="btn-hero btn-hero-primary">Войти</a>
+            <a href="/Auth/Register/Register" class="btn-hero btn-hero-secondary">Зарегистрироваться</a>
+        }
+        else
+        {
+            <a href="/Account/Index" class="btn-hero btn-hero-primary">Перейти в профиль</a>
+        }
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="feature-card">
+        <div class="feature-icon">✓</div>
+        <h3 class="feature-title">Управление задачами</h3>
+        <p class="feature-description">Создавайте, назначайте и отслеживайте задачи с разными приоритетами и статусами.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3 class="feature-title">Клиентская база</h3>
+        <p class="feature-description">Ведите учёт клиентов, их контакты и историю взаимодействия в одном месте.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Аналитика и отчёты</h3>
+        <p class="feature-description">Получайте наглядные отчёты по задачам, пользователям и клиентам.</p>
+    </div>
+</div>
+
+<div class="news-section">
+    <div class="news-header">
+        <h2 class="news-title">Последние новости компании</h2>
+        <span class="news-count">@ViewBag.News?.Count новостей</span>
+    </div>
+    @{
+        var news = ViewBag.News as List<dynamic> ?? new List<dynamic>
+        {
+        new { Date = "15.03.2025", Title = "Обновление системы", Description = "Добавлены новые возможности для аналитики." },
+        new { Date = "10.03.2025", Title = "Новый дизайн", Description = "Мы обновили интерфейс для вашего удобства." },
+        new { Date = "05.03.2025", Title = "Внедрение отчётов", Description = "Теперь доступны отчёты по статусам и приоритетам." },
+        new { Date = "01.03.2025", Title = "Расширение команды", Description = "К нам присоединились новые разработчики." }
+        };
+    }
+    @foreach (var item in news)
+    {
+        <div class="news-item">
+            <div class="news-date">@item.Date</div>
+            <div class="news-content">
+                <h3>@item.Title</h3>
+                <p>@item.Description</p>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    // Простая анимация появления карточек
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.feature-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    });
+</script>

@@ -1,0 +1,573 @@
+﻿@using CRMSystem.Modules.Auth.Domain.Entities
+@using System.Security.Claims
+@{
+    Layout = null;
+    var name = User.Identity?.Name;
+	var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RegistrationSite</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            --success-gradient: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            --text-dark: #333;
+            --text-light: #666;
+            --bg-light: #f8f9fa;
+            --border-color: #e1e5e9;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --radius: 15px;
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Navigation */
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover,
+            .nav-link.active {
+                color: var(--primary-color);
+                background: rgba(102, 126, 234, 0.1);
+            }
+
+        /* User Menu */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: var(--bg-light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .user-info:hover {
+                background: rgba(102, 126, 234, 0.1);
+            }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: var(--danger-gradient);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+            .logout-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-wrapper {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            margin-top: auto;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+            .footer-link:hover {
+                color: var(--primary-color);
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-menu {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .user-menu {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .content-wrapper {
+                padding: 25px 20px;
+            }
+
+            .footer-container {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .logo-text {
+                font-size: 18px;
+            }
+
+            .nav-menu {
+                gap: 10px;
+            }
+
+            .nav-link {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .content-wrapper {
+                padding: 20px 15px;
+            }
+        }
+
+        /* Common Components */
+        .alert-error {
+            background: var(--danger-gradient);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .alert-success {
+            background: var(--success-gradient);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2b8a3e;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: var(--bg-light);
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                background-color: white;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 2px solid var(--border-color);
+        }
+
+            .btn-secondary:hover {
+                background: #e9ecef;
+                border-color: var(--primary-color);
+            }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">CRM</div>
+                <div class="logo-text">CRM System</div>
+            </a>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+                            Главная
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Account" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Account" ? "active" : "")">
+                            Профиль
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Customers" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Customers" ? "active" : "")">
+                            Клиенты
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Tasks" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Tasks" ? "active" : "")">
+                            Задачи
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Report" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Report" ? "active" : "")">
+                            Отчеты
+                        </a>
+                    </li>
+                    @if(role == "Admin")
+                    {
+                        <li class="nav-item">
+                            <a href="/Admin" class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Admin" ? "active" : "")">
+                                Админ.панель
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+
+            <div class="user-menu">
+                <div class="user-info" onclick="toggleUserMenu()">
+                    <div class="user-avatar">
+                        @if (name != null)
+                        {
+                            name.ToString().Substring(0, 1).ToUpper();
+                        }
+                        else
+                        {
+                            @:U
+                        }
+                    </div>
+                    <span class="user-name">@(name ?? "Пользователь")</span>
+                </div>
+                <form action="/Account/Logout" method="post" style="display: inline;">
+                    <button type="submit" class="logout-btn">Выход</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @if (!string.IsNullOrEmpty(ViewData["Title"]?.ToString()))
+        {
+            <h1 class="page-title">@ViewData["Title"]</h1>
+        }
+
+        <div class="content-wrapper">
+            <!-- Отображение сообщений об ошибках/успехе -->
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert-error">
+                    <strong>Ошибка!</strong> @TempData["ErrorMessage"]
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="copyright">
+                © @DateTime.Now.Year CRM-System by Kamil "gint1k" Khairullin. Все права защищены.
+            </div>
+            <div class="footer-links">
+                <a href="/Privacy" class="footer-link">Политика конфиденциальности</a>
+                <a href="/Terms" class="footer-link">Условия использования</a>
+                <a href="/Contact" class="footer-link">Контакты</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Скрытие сообщений об ошибках через 5 секунд
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorAlert = document.querySelector('.alert-error');
+            if (errorAlert) {
+                setTimeout(() => {
+                    errorAlert.style.opacity = '0';
+                    errorAlert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => errorAlert.remove(), 500);
+                }, 5000);
+            }
+
+            const successAlert = document.querySelector('.alert-success');
+            if (successAlert) {
+                setTimeout(() => {
+                    successAlert.style.opacity = '0';
+                    successAlert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => successAlert.remove(), 500);
+                }, 3000);
+            }
+
+            // Подтверждение выхода
+            const logoutForm = document.querySelector('form[action*="Logout"]');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function(e) {
+                    if (!confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Подсветка активного пункта меню
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (currentPath === href || currentPath.startsWith(href + '/')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        function toggleUserMenu() {
+            // Можно добавить выпадающее меню пользователя
+            alert('Меню пользователя');
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

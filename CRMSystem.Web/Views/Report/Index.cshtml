@@ -1,0 +1,273 @@
+﻿@using CRMSystem.Shared.DTO.Report
+@model DashboardStatsDto
+@{
+    Layout = "_ReportLayout";
+    ViewData["Title"] = "Общая статистика";
+}
+
+<!-- Подключаем Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 25px;
+        color: white;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .charts-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        padding: 25px;
+        transition: transform 0.3s ease;
+    }
+
+        .chart-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+    .chart-title {
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e1e5e9;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+
+    .additional-info {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .info-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+    .info-label {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 768px) {
+        .charts-row {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrapper {
+            height: 200px;
+        }
+    }
+</style>
+
+<div class="report-card">
+    <h2 style="margin-bottom: 20px; color: #333;">Общая статистика</h2>
+
+    <!-- Карточки с основными показателями -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-value">@Model.TotalTasks</div>
+            <div class="stat-label">Всего задач</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">@Model.CompletedTasks</div>
+            <div class="stat-label">Выполнено</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">@Model.InProgressTasks</div>
+            <div class="stat-label">В работе</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">@Model.NewTasks</div>
+            <div class="stat-label">Новые</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">@Model.TotalCustomers</div>
+            <div class="stat-label">Клиентов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">@Model.TotalUsers</div>
+            <div class="stat-label">Пользователей</div>
+        </div>
+    </div>
+
+    <!-- Диаграммы -->
+    <div class="charts-row">
+        <div class="chart-container">
+            <div class="chart-title">Распределение по статусам</div>
+            <div class="chart-wrapper">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Соотношение задач и клиентов</div>
+            <div class="chart-wrapper">
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительная информация -->
+    <div class="additional-info">
+        <h3 style="color: #333; font-size: 16px; font-weight: 600; margin-bottom: 10px;">Детальная информация</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Процент выполнения</div>
+                <div class="info-value">
+                    @{
+                        var completionPercent = Model.TotalTasks > 0 ? (Model.CompletedTasks * 100 / Model.TotalTasks) : 0;
+                    }
+                    @completionPercent%
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Задач на пользователя</div>
+                <div class="info-value">
+                    @{
+                        var tasksPerUser = Model.TotalUsers > 0 ? (Model.TotalTasks / Model.TotalUsers) : 0;
+                    }
+                    @tasksPerUser
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Задач на клиента</div>
+                <div class="info-value">
+                    @{
+                        var tasksPerCustomer = Model.TotalCustomers > 0 ? (Model.TotalTasks / Model.TotalCustomers) : 0;
+                    }
+                    @tasksPerCustomer
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Данные из модели
+            const totalTasks = @Model.TotalTasks;
+            const completed = @Model.CompletedTasks;
+            const inProgress = @Model.InProgressTasks;
+            const newTasks = @Model.NewTasks;
+            const totalCustomers = @Model.TotalCustomers;
+            const totalUsers = @Model.TotalUsers;
+
+            // Диаграмма статусов (пончик)
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Новые', 'В работе', 'Выполненные'],
+                    datasets: [{
+                        data: [newTasks, inProgress, completed],
+                        backgroundColor: ['#3498db', '#f39c12', '#27ae60'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#333', font: { size: 12 } }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // Диаграмма сравнения (столбчатая)
+            const ctxComparison = document.getElementById('comparisonChart').getContext('2d');
+            new Chart(ctxComparison, {
+                type: 'bar',
+                data: {
+                    labels: ['Задачи', 'Клиенты', 'Пользователи'],
+                    datasets: [{
+                        label: 'Количество',
+                        data: [totalTasks, totalCustomers, totalUsers],
+                        backgroundColor: ['#667eea', '#27ae60', '#e74c3c'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e1e5e9' },
+                            ticks: { stepSize: 1, color: '#666' }
+                        },
+                        x: { ticks: { color: '#333' } }
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,145 @@
+﻿@using CRMSystem.Shared.Entities
+@model CustomerCreateViewModel
+
+@{
+    ViewData["Title"] = "Добавление клиента";
+    Layout = "_Layout";
+}
+
+<style>
+    .form-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #111827;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 24px;
+    }
+
+    .btn {
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+    .validation {
+        color: #dc2626;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-header">
+        Добавление клиента
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div class="form-group">
+            <label asp-for="Name" class="form-label">ФИО</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="form-label">Эл.почта</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone" class="form-label">Номер телефона</label>
+            <input asp-for="Phone" class="form-control" />
+            <span asp-validation-for="Phone" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Company" class="form-label">Компания</label>
+            <input asp-for="Company" class="form-control" />
+            <span asp-validation-for="Company" class="validation"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Status" class="form-label">Статус сотрудничества</label>
+            <select asp-for="Status"
+                    asp-items="Html.GetEnumSelectList<CustomerStatus>()"
+                    class="form-control">
+            </select>
+            <span asp-validation-for="Status" class="validation"></span>
+        </div>
+
+        <div class="form-actions">
+            <a asp-action="Index" class="btn btn-secondary">
+                Назад
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

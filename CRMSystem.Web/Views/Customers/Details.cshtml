@@ -1,0 +1,180 @@
+﻿@using CRMSystem.Shared.Entities
+@model Customer
+
+@{
+    ViewData["Title"] = "Карточка клиента";
+    Layout = "_Layout";
+}
+
+<style>
+    .details-wrapper {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .details-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .status {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .details-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .info-item {
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 12px;
+    }
+
+    .info-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 6px;
+    }
+
+    .info-value {
+        font-size: 15px;
+        font-weight: 500;
+        color: #111827;
+        word-break: break-word;
+    }
+
+    .details-actions {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn {
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+</style>
+
+<div class="details-wrapper">
+    <div class="details-header">
+        <div class="details-title">
+            @Model.Name
+        </div>
+
+        @{
+            var statusClass = Model.Status switch
+            {
+                CustomerStatus.Client => "status status-active",
+                CustomerStatus.Archived => "status status-inactive",
+                CustomerStatus.Negotiation => "status status-pending",
+                _ => "status"
+            };
+        }
+
+        <span class="@statusClass">
+            @Model.Status
+        </span>
+    </div>
+
+    <div class="details-card">
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">@Model.Email</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Телефон</div>
+                <div class="info-value">@Model.Phone</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Компания</div>
+                <div class="info-value">@Model.Company</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Дата создания</div>
+                <div class="info-value">
+                    @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Создал</div>
+                <div class="info-value">
+                    @Model.CreatedBy.Name
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        <a asp-action="Index" class="btn btn-secondary">
+            Назад
+        </a>
+
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+            Редактировать
+        </a>
+    </div>
+</div>

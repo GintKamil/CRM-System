@@ -1,0 +1,312 @@
+﻿@using CRMSystem.Shared.DTO.Report
+
+@model List<TasksByUserDto>
+@{
+    Layout = "_ReportLayout";
+    ViewData["Title"] = "Отчет по пользователям";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+    .report-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+        margin-bottom: 20px;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    .stats-mini {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-mini-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+
+    .stat-mini-label {
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-mini-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-title {
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e1e5e9;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    .details-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #f8f9fa;
+        padding: 16px 20px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e1e5e9;
+    }
+
+    td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .user-email {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        width: 200px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 4px;
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .progress-bar {
+            width: 100px;
+        }
+    }
+</style>
+
+<div class="report-card">
+    <h2 style="margin-bottom: 20px; color: #333;">Распределение задач по пользователям</h2>
+
+    @{
+        var totalTasks = Model.Sum(d => d.Count);
+        var totalUsers = Model.Count;
+        var avgTasks = totalUsers > 0 ? totalTasks / (double)totalUsers : 0;
+    }
+
+    <!-- Краткая статистика -->
+    <div class="stats-mini">
+        <div class="stat-mini-item">
+            <div class="stat-mini-label">Всего задач</div>
+            <div class="stat-mini-value">@totalTasks</div>
+        </div>
+        <div class="stat-mini-item">
+            <div class="stat-mini-label">Всего пользователей</div>
+            <div class="stat-mini-value">@totalUsers</div>
+        </div>
+        <div class="stat-mini-item">
+            <div class="stat-mini-label">Среднее задач</div>
+            <div class="stat-mini-value">@avgTasks.ToString("0.0")</div>
+        </div>
+    </div>
+
+    <!-- Столбчатая диаграмма -->
+    <div class="chart-container">
+        <div class="chart-title">Задачи по пользователям</div>
+        <div class="chart-wrapper">
+            <canvas id="userChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Таблица с деталями -->
+    <div class="details-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Пользователь</th>
+                    <th>Количество задач</th>
+                    <th>Процент</th>
+                    <th>Прогресс</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderByDescending(d => d.Count))
+                {
+                    var percent = totalTasks > 0 ? (item.Count * 100 / totalTasks) : 0;
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    @if (!string.IsNullOrEmpty(item.User?.Name))
+                                    {
+                                        @item.User.Name.Substring(0, 1).ToUpper()
+                                    }
+                                    else
+                                    {
+                                        @:U
+                                    }
+                                </div>
+                                <div class="user-details">
+                                    <span class="user-name">@(item.User?.Name ?? "Неизвестно")</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@item.Count</td>
+                        <td>@percent%</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: @percent%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Получаем данные из модели
+            var userData = @Html.Raw(Json.Serialize(Model));
+
+            // Подготовка массивов для диаграммы (имена пользователей и количество задач)
+            var labels = userData.map(item => item.user ? item.user.name : 'Неизвестно');
+            var counts = userData.map(item => item.count);
+
+            // Генерируем цвета (можно сделать градиент или разные оттенки)
+            var backgroundColors = [];
+            for (var i = 0; i < labels.length; i++) {
+                // Линейный градиент от синего к фиолетовому
+                var r = 102 + (i * 10) % 50;
+                var g = 126 + (i * 5) % 50;
+                var b = 234 - (i * 10) % 50;
+                backgroundColors.push(`rgba(${r}, ${g}, ${b}, 0.8)`);
+            }
+
+            // Столбчатая диаграмма
+            var ctx = document.getElementById('userChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Количество задач',
+                        data: counts,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e1e5e9' },
+                            ticks: { stepSize: 1, color: '#666' }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#333',
+                                maxRotation: 45,
+                                minRotation: 30
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,296 @@
+﻿@using CRMSystem.Modules.Auth.Domain.Entities
+@model User
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h2 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+            min-height: 18px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .form-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .password-requirements h4 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .password-requirements ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .password-requirements li {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 4px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .password-requirements li:before {
+            content: "•";
+            color: #667eea;
+            position: absolute;
+            left: 0;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @@media (max-width: 480px) {
+            .register-container {
+                padding: 30px 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon .form-control {
+            padding-right: 40px;
+        }
+
+        .field-icon {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            color: #666;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h2>Создать аккаунт</h2>
+            <p>Заполните форму для регистрации</p>
+        </div>
+
+        <form method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="Name">Ник пользователя</label>
+                    <input type="text" id="Name" name="Name" class="form-control" value="@Model?.Name" placeholder="Придумайте никнейм" />
+                    <span class="text-danger" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Электронная почта</label>
+                <input type="email" id="Email" name="Email" class="form-control" value="@Model?.Email" placeholder="example@mail.com" />
+                <span class="text-danger" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="Password">Пароль</label>
+                <div class="input-with-icon">
+                    <input type="password" id="Password" name="Password" class="form-control" value="@Model?.Password" placeholder="Создайте надежный пароль" />
+                    <span class="text-danger" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+
+            <div class="password-requirements">
+                <h4>Требования к паролю:</h4>
+                <ul>
+                    <li>Минимум 8 символов</li>
+                    <li>Цифры и буквы</li>
+                    <li>Специальные символы</li>
+                </ul>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Создать аккаунт
+            </button>
+        </form>
+
+        <div class="form-footer">
+            <a href="/Authorization">Уже есть аккаунт? Войдите</a>
+        </div>
+    </div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+
+    <script>
+        // Простой скрипт для показа/скрытия пароля
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('Password');
+            if (passwordInput) {
+                const icon = document.createElement('span');
+                icon.className = 'field-icon';
+                icon.innerHTML = '👁️';
+                icon.style.cursor = 'pointer';
+                icon.onclick = function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.innerHTML = '🔒';
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.innerHTML = '👁️';
+                    }
+                };
+                passwordInput.parentNode.appendChild(icon);
+            }
+        });
+    </script>
+</body>
+</html>
