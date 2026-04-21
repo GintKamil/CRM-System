@@ -1,9 +1,12 @@
 ﻿using CRMSystem.Modules.Auth.Domain.Entities;
 using CRMSystem.Modules.Tasks.DTO;
 using CRMSystem.Modules.Tasks.Model;
+using CRMSystem.Shared.Comment;
 using CRMSystem.Shared.DTO.Api;
+using CRMSystem.Shared.DTO.Comment;
 using CRMSystem.Shared.Entities;
 using CRMSystem.Shared.Security;
+using Microsoft.AspNetCore.SignalR;
 using System.Reflection.Metadata.Ecma335;
 
 namespace CRMSystem.Modules.Tasks.Application
@@ -23,17 +26,30 @@ namespace CRMSystem.Modules.Tasks.Application
         public UpdateTaskByExecutorDto TaskConvEditExecutor(TaskM taskData);
         public UpdateTaskByManagerDto TaskConvEditManager(TaskM taskData);
         public TaskApiDto MapToDto(TaskM task);
+        public Task AddComment(int userId, CreateCommentDto commentDto);
+        public Task<List<CommentDto>> GetCommentsByTaskId(int taskId);
     }
 
     public class TaskService : ITaskService
     {
-        public ITaskRepository _context;
-        public TaskService(ITaskRepository context) {
+        private readonly ITaskRepository _context;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public TaskService(ITaskRepository context, IHubContext<NotificationHub> hubContext) 
+        {
             _context = context; 
+            _hubContext = hubContext;
         }
 
         public async Task<TaskM> Create(TaskM task)
         {
+            await _hubContext.Clients.User(task.AssignedToId.ToString()).SendAsync(
+                "ReceiveNotification", 
+                $"Создана новая задача: {task.Title}"
+            );
+            await _hubContext.Clients.User(task.CreatedById.ToString()).SendAsync(
+                "ReceiveNotification",
+                $"Вы создали новую задачу: {task.Title}"
+            );
             return await _context.CreateTask(task);
         }
 
@@ -198,6 +214,47 @@ namespace CRMSystem.Modules.Tasks.Application
         public TaskM TaskConvApi(TaskCreateApiDto taskCreateApiDto)
         {
             return null;
+        }
+        public async Task AddComment(int userId, CreateCommentDto commentDto)
+        {
+            var task = await _context.GetTask(commentDto.TaskId);
+            if (task == null)
+                throw new Exception("Задача не найдена");
+
+            var comment = new TaskComment
+            {
+                Message = commentDto.Message,
+                TaskId = commentDto.TaskId,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow
+            };
+            
+            await _context.AddComment(comment);
+
+            var notifyUserIds = new HashSet<int>();
+
+            notifyUserIds.Add(task.AssignedToId);
+            notifyUserIds.Add(task.CreatedById);
+            notifyUserIds.Remove(userId);
+
+            foreach (var notifyUserId in notifyUserIds)
+            {
+                await _hubContext.Clients.User(notifyUserId.ToString()).SendAsync(
+                    "ReceiveNotification",
+                    $"Новый комментарий к задаче: {task.Title}"
+                );
+            }
+        }
+        public async Task<List<CommentDto>> GetCommentsByTaskId(int taskId)
+        {
+            var comments = await _context.GetCommentsByTaskId(taskId);
+            
+            return comments.Select(c => new CommentDto
+            {
+                UserName = c.User.Name,
+                Message = c.Message,
+                CreatedAt = c.CreatedAt
+            }).ToList();
         }
     }
 }

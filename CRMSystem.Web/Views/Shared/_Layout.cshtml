@@ -12,6 +12,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RegistrationSite</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
     <style>
         * {
@@ -405,6 +406,68 @@
             margin-top: 5px;
             display: block;
         }
+
+        #notification-container {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            min-width: 280px;
+            max-width: 350px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            animation: slideInRight 0.4s ease, fadeOut 0.4s ease 4.5s forwards;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .notification.success {
+                background: var(--success-gradient);
+            }
+
+            .notification.error {
+                background: var(--danger-gradient);
+            }
+
+            .notification.info {
+                background: var(--primary-gradient);
+            }
+
+        .notification-close {
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+            .notification-close:hover {
+                opacity: 1;
+            }
+
+        /* Анимации */
+        /*  slideInRight {
+            from
+            {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        } */
     </style>
 
     @RenderSection("Styles", required: false)
@@ -502,6 +565,7 @@
 
             @RenderBody()
         </div>
+        <div id="notification-container"></div>
     </main>
 
     <!-- Footer -->
@@ -566,6 +630,41 @@
             // Можно добавить выпадающее меню пользователя
             alert('Меню пользователя');
         }
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notifications")
+            .build();
+
+        function showNotification(message, type = "info") {
+            const container = document.getElementById("notification-container");
+
+            const notification = document.createElement("div");
+            notification.className = `notification ${type}`;
+
+            notification.innerHTML = `
+                <span>${message}</span>
+                <span class="notification-close">&times;</span>
+            `;
+
+            // Закрытие по клику
+            notification.querySelector(".notification-close").onclick = () => {
+                notification.remove();
+            };
+
+            container.appendChild(notification);
+
+            // Авто удаление
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        connection.on("ReceiveNotification", function (message) {
+            showNotification(message, "info");
+        });
+
+        connection.start()
+            .catch(err => console.error(err.toString()));
     </script>
 
     @RenderSection("Scripts", required: false)

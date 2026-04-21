@@ -1,4 +1,5 @@
 ﻿using CRMSystem.Infrastructure.DB;
+using CRMSystem.Shared.Comment;
 using CRMSystem.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace CRMSystem.Infrastructure.Repositories
         {
             _context = context;
         }
-        
+
         public async Task<TaskM> CreateTask(TaskM task)
         {
             try
@@ -29,10 +30,8 @@ namespace CRMSystem.Infrastructure.Repositories
 
         public async Task<TaskM> UpdateTask(TaskM task)
         {
-            Console.WriteLine("Репозиторий1");
             _context.Tasks.Update(task);
             await _context.SaveChangesAsync();
-            Console.WriteLine("Репозиторий2");
             return task;
         }
         public async Task<TaskM> GetTask(int id)
@@ -82,6 +81,22 @@ namespace CRMSystem.Infrastructure.Repositories
                 .Include(t => t.AssignedTo)
                 .Include(t => t.CreatedBy)
                 .Where(t => t.AssignedToId == userId)
+                .ToListAsync();
+        }
+
+        public async Task AddComment(TaskComment comment)
+        {
+            Console.WriteLine($"taskid - {comment.TaskId}, task - {comment.Task}, message - {comment.Message}");
+            await _context.TaskComments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<TaskComment>> GetCommentsByTaskId(int taskId)
+        {
+            return await _context.TaskComments
+                .Where(c => c.TaskId == taskId)
+                .Include(c => c.User)
+                .OrderBy(c => c.CreatedAt)
                 .ToListAsync();
         }
     }

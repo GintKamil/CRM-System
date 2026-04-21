@@ -3,6 +3,7 @@ using CRMSystem.Modules.Auth.Domain.Entities;
 using CRMSystem.Modules.Customers.Application;
 using CRMSystem.Modules.Tasks.Application;
 using CRMSystem.Modules.Tasks.DTO;
+using CRMSystem.Shared.DTO.Comment;
 using CRMSystem.Shared.Entities;
 using CRMSystem.Shared.Security;
 using Microsoft.AspNetCore.Authorization;
@@ -75,7 +76,13 @@ namespace CRMSystem.Web.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var task = await _taskService.GetTask(id);
-            return View(task);
+            var comments = await _taskService.GetCommentsByTaskId(id);
+            var taskDetailsVM = new TaskDetailsViewModel
+            {
+                Task = task,
+                Comments = comments
+            };
+            return View(taskDetailsVM);
         }
 
         public async Task<IActionResult> Delete(int id)
@@ -129,6 +136,15 @@ namespace CRMSystem.Web.Controllers
 
             await _taskService.UpdateByExecutor(taskUpdate);
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddComment(CreateCommentDto dto)
+        {
+            var user = UserContext.FromClaims(User);
+            Console.WriteLine($"taskid - {dto.TaskId}, message - {dto.Message}");
+            await _taskService.AddComment(user.Id, dto);
+            return RedirectToAction(nameof(Details), new { id = dto.TaskId });
         }
 
         private async Task<List<SelectListItem>> GetCustomers()

@@ -1,33 +1,39 @@
 ﻿@using CRMSystem.Shared.Entities
-@model TaskM
+@model TaskDetailsViewModel
 
 @{
     ViewData["Title"] = "Задача";
     Layout = "_Layout";
+
+    var task = Model.Task;
 }
 
 <style>
     .details-wrapper {
-        max-width: 800px;
+        max-width: 900px;
         margin: 0 auto;
     }
 
     .details-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+        gap: 16px;
         margin-bottom: 24px;
+        flex-wrap: wrap;
     }
 
     .details-title {
         font-size: 22px;
         font-weight: 600;
         color: #111827;
+        line-height: 1.3;
     }
 
     .badges {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .badge {
@@ -68,12 +74,20 @@
         color: #991b1b;
     }
 
-    .details-card {
+    .details-card,
+    .comments-card {
         background: #ffffff;
         border-radius: 16px;
         padding: 24px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         margin-bottom: 24px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 18px;
     }
 
     .info-grid {
@@ -112,9 +126,101 @@
         white-space: pre-wrap;
     }
 
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .comment-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px;
+        background: #f9fafb;
+        transition: 0.2s ease;
+    }
+
+        .comment-item:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .comment-user {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .comment-date {
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+    }
+
+    .comment-message {
+        font-size: 14px;
+        color: #374151;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .comments-empty {
+        padding: 18px;
+        border-radius: 14px;
+        background: #f9fafb;
+        border: 1px dashed #d1d5db;
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .comment-form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .comment-textarea {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        padding: 14px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        font-size: 14px;
+        color: #111827;
+        background: #f9fafb;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+        .comment-textarea:focus {
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+        }
+
+    .comment-form-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
     .details-actions {
         display: flex;
         justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
     .btn {
@@ -125,8 +231,15 @@
         font-weight: 500;
         cursor: pointer;
         text-decoration: none;
-        transition: background 0.2s;
+        transition: background 0.2s, transform 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
 
     .btn-primary {
         background: #2563eb;
@@ -145,17 +258,44 @@
         .btn-secondary:hover {
             background: #d1d5db;
         }
+
+    @@media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .details-card,
+        .comments-card {
+            padding: 18px;
+        }
+
+        .details-actions {
+            flex-direction: column;
+        }
+
+            .details-actions .btn {
+                width: 100%;
+            }
+
+        .comment-form-actions {
+            justify-content: stretch;
+        }
+
+            .comment-form-actions .btn {
+                width: 100%;
+            }
+    }
 </style>
 
 <div class="details-wrapper">
     <div class="details-header">
         <div class="details-title">
-            @Model.Title
+            @task.Title
         </div>
 
         <div class="badges">
             @{
-                var statusClass = Model.Status switch
+                var statusClass = task.Status switch
                 {
                     CRMSystem.Shared.Entities.TaskStatus.New => "badge status-new",
                     CRMSystem.Shared.Entities.TaskStatus.AtWork => "badge status-inprogress",
@@ -163,7 +303,7 @@
                     _ => "badge"
                 };
 
-                var priorityClass = Model.Priority switch
+                var priorityClass = task.Priority switch
                 {
                     TaskPriority.Low => "badge priority-low",
                     TaskPriority.Medium => "badge priority-medium",
@@ -172,47 +312,91 @@
                 };
             }
 
-            <span class="@statusClass">@Model.Status</span>
-            <span class="@priorityClass">@Model.Priority</span>
+            <span class="@statusClass">@task.Status</span>
+            <span class="@priorityClass">@task.Priority</span>
         </div>
     </div>
 
     <div class="details-card">
+        <div class="section-title">Информация о задаче</div>
+
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">Клиент</div>
-                <div class="info-value">@Model.Customer.Name</div>
+                <div class="info-value">@task.Customer.Name</div>
             </div>
 
             <div class="info-item">
                 <div class="info-label">Ответственный</div>
-                <div class="info-value">@Model.AssignedTo.Name</div>
+                <div class="info-value">@task.AssignedTo.Name</div>
             </div>
 
             <div class="info-item">
                 <div class="info-label">Срок выполнения</div>
                 <div class="info-value">
-                    @Model.DueDate.ToString("dd.MM.yyyy")
+                    @task.DueDate.ToString("dd.MM.yyyy")
                 </div>
             </div>
 
             <div class="info-item">
                 <div class="info-label">Создано</div>
                 <div class="info-value">
-                    @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                    @task.CreatedAt.ToString("dd.MM.yyyy HH:mm")
                 </div>
             </div>
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        @if (!string.IsNullOrWhiteSpace(task.Description))
         {
             <div class="description">
                 <div class="info-label">Описание</div>
                 <div class="description-text">
-                    @Model.Description
+                    @task.Description
                 </div>
             </div>
         }
+    </div>
+
+    <div class="comments-card">
+        <div class="section-title">Комментарии</div>
+
+        @if (Model.Comments != null && Model.Comments.Any())
+        {
+            <div class="comments-list">
+                @foreach (var comment in Model.Comments.OrderByDescending(x => x.CreatedAt))
+                {
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-user">@comment.UserName</div>
+                            <div class="comment-date">@comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+
+                        <div class="comment-message">@comment.Message</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="comments-empty">
+                Пока комментариев нет. Будьте первым, кто оставит комментарий.
+            </div>
+        }
+
+        <form asp-action="AddComment" method="post" class="comment-form">
+            <input type="hidden" name="TaskId" value="@task.Id" />
+
+            <textarea name="Message"
+                      class="comment-textarea"
+                      placeholder="Введите комментарий..."
+                      required></textarea>
+
+            <div class="comment-form-actions">
+                <button type="submit" class="btn btn-primary">
+                    Добавить комментарий
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="details-actions">
@@ -220,7 +404,7 @@
             Назад
         </a>
 
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+        <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-primary">
             Редактировать
         </a>
     </div>
