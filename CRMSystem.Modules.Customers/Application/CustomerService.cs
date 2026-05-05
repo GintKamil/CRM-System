@@ -8,7 +8,7 @@ namespace CRMSystem.Modules.Customers.Application
     public interface ICustomerService
     {
         public Task<Customer> CreateCustomer(Customer customer);
-        public Task<Customer> UpdateCustomer(Customer customerData);
+        public Task<Customer> UpdateCustomer(CustomerCreateViewModel customerData);
         public Task<Customer> GetCustomer(int id);
         public Task<List<Customer>> GetAllCustomer();
         public Task<Customer> DeleteCustomer(int id);
@@ -34,10 +34,14 @@ namespace CRMSystem.Modules.Customers.Application
             await _customerRepository.CreateCustomer(customer);
             return customer;
         }
-        public async Task<Customer> UpdateCustomer(Customer customerData)
+        public async Task<Customer> UpdateCustomer(CustomerCreateViewModel customerData)
         {
-            await _customerRepository.UpdateCustomer(customerData);
-            return customerData;
+            var customer = await _customerRepository.GetCustomerEmail(customerData.Email);
+            var user = await _userRepository.GetId(customer.CreatedById);
+            var customerEdit = СustomerСonversion(customerData, user);
+            customerEdit.Id = customer.Id;
+            await _customerRepository.UpdateCustomer(customerEdit);
+            return customerEdit;
         }
         public async Task<Customer> GetCustomer(int id)
         {

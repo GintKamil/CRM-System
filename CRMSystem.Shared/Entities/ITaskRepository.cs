@@ -1,4 +1,6 @@
-﻿namespace CRMSystem.Shared.Entities
+﻿using CRMSystem.Shared.Comment;
+
+namespace CRMSystem.Shared.Entities
 {
     public interface ITaskRepository
     {
@@ -10,5 +12,7 @@
         public Task<TaskM> DeleteTask(int id);
         public Task<List<TaskM>> GetCreatedByUser(int userId);
         public Task<List<TaskM>> GetAssignedByUser(int userId);
+        public Task AddComment(TaskComment comment);
+        public Task<List<TaskComment>> GetCommentsByTaskId(int taskId);
     }
 }

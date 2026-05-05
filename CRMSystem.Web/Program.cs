@@ -9,6 +9,10 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddCustomersModule();
@@ -49,6 +53,8 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 //app.MapRazorPages();
+
+app.MapHub<NotificationHub>("/notifications");
 
 app.MapControllerRoute(
     name: "areas",

@@ -23,7 +23,7 @@ namespace CRMSystem.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            if(await _userService.ValidateUser(dto.Email, dto.Password)) 
+            if (await _userService.ValidateUser(dto.Email, dto.Password)) 
             {
                 var user = await _userService.GetEmail(dto.Email);
 

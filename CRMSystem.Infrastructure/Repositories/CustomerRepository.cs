@@ -5,6 +5,7 @@ using CRMSystem.Shared.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
+using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace CRMSystem.Infrastructure.Repositories
@@ -36,19 +37,34 @@ namespace CRMSystem.Infrastructure.Repositories
 
             if (customer == null)
                 return null;
-            
+
+            var existingCustomer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.Email == customerData.Email
+                           && c.Id != customerData.Id);
+
+            if (existingCustomer != null)
+                Console.WriteLine("Email уже используется другим клиентом");
+
+
             customer.Name = customerData.Name;
             customer.Email = customerData.Email;
             customer.Phone = customerData.Phone;
             customer.Company = customerData.Company;
             customer.Status = customerData.Status;
-
+            Console.WriteLine("Данные клиента успешно обновлены");
+            //_context.Customers.Update(customerData);
             await _context.SaveChangesAsync();
-            return customer;
+
+            return customerData;
         }
         public async Task<Customer> GetCustomer(int id)
         {
             return await _context.Customers.Include(c => c.CreatedBy).FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<Customer> GetCustomerEmail(string email)
+        {
+            return await _context.Customers.FirstOrDefaultAsync(u => u.Email == email);
         }
         public async Task<List<Customer>> GetAllCustomer()
         {

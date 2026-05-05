@@ -1,9 +1,11 @@
 ﻿using CRMSystem.Infrastructure.Repositories;
 using CRMSystem.Modules.Auth.Application.Services;
 using CRMSystem.Modules.Auth.Infrastructure.Mail;
+using CRMSystem.Modules.Auth.Infrastructure.Provider;
 using CRMSystem.Modules.Auth.Infrastructure.Security;
 using CRMSystem.Shared.Entities;
 using DotNetEnv;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CRMSystem.Modules.Auth
 {
@@ -18,6 +20,7 @@ namespace CRMSystem.Modules.Auth
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             services.AddScoped(typeof(IEmailService), typeof(EmailService));
             services.AddScoped(typeof(IAuthService), typeof(AuthService));
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             return services;
         }
 

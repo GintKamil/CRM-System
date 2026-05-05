@@ -47,13 +47,12 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactNative",
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy
-                .WithOrigins("http://localhost:8081", "https://localhost:8081")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
         });
 });
 
@@ -65,9 +64,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
-app.UseCors("AllowReactNative");
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -24,8 +24,8 @@ namespace CRMSystem.Web.Controllers
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             string role = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            var customers = await _customerService.GetForUser(userId, role);
-            //var customers = await _customerService.GetAllCustomer();
+            //var customers = await _customerService.GetForUser(userId, role);
+            var customers = await _customerService.GetAllCustomer();
             return View(customers);
         }
 
@@ -59,7 +59,7 @@ namespace CRMSystem.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Customer customer)
+        public async Task<IActionResult> Edit(CustomerCreateViewModel customer)
         {
             if (!ModelState.IsValid)
                 return View(customer);
